@@ -10,6 +10,7 @@ variable "subnet_ids" {
   type = "list"
 }
 
+variable "vpc_id" {}
 variable "vpc_security_group_ids" {}
 variable "hashidemos_zone_id" {}
 variable "database_pwd" {}

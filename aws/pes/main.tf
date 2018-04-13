@@ -28,17 +28,54 @@ resource "aws_instance" "pes" {
   }
 }
 
-resource "aws_eip" "pes" {
-  instance = "${aws_instance.pes.0.id}"
-  vpc      = true
+resource "aws_lb" "pes" {
+  name               = "${local.namespace}-lb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = ["${var.subnet_ids}"]
+
+  tags {
+    Name = "${local.namespace}-lb"
+  }
+}
+
+resource "aws_lb_listener" "pes" {
+  load_balancer_arn = "${aws_lb.pes.arn}"
+  port              = "80"
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.pes.1.arn}"
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_target_group" "pes" {
+  count                = 2
+  name                 = "${local.namespace}-tg-${count.index+1}"
+  port                 = 80
+  protocol             = "TCP"
+  deregistration_delay = 15
+  vpc_id               = "${var.vpc_id}"
+}
+
+resource "aws_lb_target_group_attachment" "pes" {
+  count            = 2
+  target_group_arn = "${element(aws_lb_target_group.pes.*.arn, count.index)}"
+  target_id        = "${element(aws_instance.pes.*.id, count.index)}"
+  port             = 80
 }
 
 resource "aws_route53_record" "pes" {
   zone_id = "${var.hashidemos_zone_id}"
   name    = "${local.namespace}.hashidemos.io."
   type    = "A"
-  ttl     = "300"
-  records = ["${aws_eip.pes.public_ip}"]
+
+  alias {
+    name                   = "${aws_lb.pes.dns_name}"
+    zone_id                = "${aws_lb.pes.zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_s3_bucket" "pes" {
