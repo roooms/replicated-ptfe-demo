@@ -64,11 +64,11 @@ module "network" {
 module "pes" {
   source            = "pes/"
   namespace         = "${var.namespace}"
-  gcp_machine_type  = "${var.gcp_machine_type}"
-  gcp_machine_image = "${var.gcp_machine_image}"
   region            = "${var.region}"
   zone              = "${module.network.available_zones}"
+  gcp_machine_type  = "${var.gcp_machine_type}"
+  gcp_machine_image = "${var.gcp_machine_image}"
   owner             = "${var.owner}"
   ttl               = "${var.ttl}"
-  subnetwork        = "${module.network.public_subnet_ids}"
+  subnetwork        = "${module.network.private_subnet_self_link}"
 }

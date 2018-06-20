@@ -7,19 +7,9 @@ resource "google_compute_network" "main" {
   auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "public" {
-  count = 2
-
-  name          = "${var.namespace}-public-${count.index+1}"
-  ip_cidr_range = "10.0.${count.index+1}.0/24"
-  network       = "${google_compute_network.main.self_link}"
-}
-
 resource "google_compute_subnetwork" "private" {
-  count = 2
-
-  name          = "${var.namespace}-private-${count.index+1}"
-  ip_cidr_range = "10.1.${count.index+1}.0/24"
+  name          = "${var.namespace}-private"
+  ip_cidr_range = "10.1.0.0/24"
   network       = "${google_compute_network.main.self_link}"
 }
 
