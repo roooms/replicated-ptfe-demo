@@ -27,6 +27,12 @@ resource "google_compute_instance" "main" {
       ip_cidr_range = "10.1.0.5/32"
     }
   }
+
+  service_account {
+    scopes = ["https://www.googleapis.com/auth/sqlservice.admin"]
+  }
+
+  allow_stopping_for_update = true
 }
 
 resource "google_compute_instance" "standby" {
@@ -45,6 +51,12 @@ resource "google_compute_instance" "standby" {
     access_config = {}
     subnetwork    = "${var.subnetwork}"
   }
+
+  service_account {
+    scopes = ["https://www.googleapis.com/auth/sqlservice.admin"]
+  }
+
+  allow_stopping_for_update = true
 }
 
 resource "google_sql_database_instance" "pes" {
