@@ -6,8 +6,8 @@ locals {
   namespace = "${var.namespace}-pes"
 }
 
-resource "google_compute_instance" "main" {
-  name         = "${local.namespace}-instance-main"
+resource "google_compute_instance" "ptfe1" {
+  name         = "${local.namespace}-instance-ptfe1"
   machine_type = "${var.gcp_machine_type}"
   zone         = "${var.zone[0]}"
 
@@ -19,12 +19,10 @@ resource "google_compute_instance" "main" {
   }
 
   network_interface {
-    access_config {}
-
     subnetwork = "${var.subnetwork}"
 
     alias_ip_range = {
-      ip_cidr_range = "10.1.0.5/32"
+      ip_cidr_range = "${var.active_ptfe_instance == "ptfe1" ? var.active_alias_ip : var.standby_alias_ip}/32"
     }
   }
 
@@ -35,8 +33,8 @@ resource "google_compute_instance" "main" {
   allow_stopping_for_update = true
 }
 
-resource "google_compute_instance" "standby" {
-  name         = "${local.namespace}-instance-standby"
+resource "google_compute_instance" "ptfe2" {
+  name         = "${local.namespace}-instance-ptfe2"
   machine_type = "${var.gcp_machine_type}"
   zone         = "${var.zone[1]}"
 
@@ -48,8 +46,11 @@ resource "google_compute_instance" "standby" {
   }
 
   network_interface {
-    access_config = {}
-    subnetwork    = "${var.subnetwork}"
+    subnetwork = "${var.subnetwork}"
+
+    alias_ip_range = {
+      ip_cidr_range = "${var.active_ptfe_instance == "ptfe2" ? var.active_alias_ip : var.standby_alias_ip}/32"
+    }
   }
 
   service_account {
@@ -60,7 +61,7 @@ resource "google_compute_instance" "standby" {
 }
 
 resource "google_sql_database_instance" "pes" {
-  #name = "${local.namespace}-sql-db" # cannot be reused for upto one week
+  #name = "${local.namespace}-sql-db" # cannot be reused for one week
   database_version = "POSTGRES_9_6"
   region           = "${var.region}"
 
