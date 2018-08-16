@@ -8,6 +8,11 @@ provider "google" {
   region      = "${var.region}"
 }
 
+resource "google_compute_project_metadata_item" "ssh_key" {
+  key   = "ssh-keys"
+  value = "roooms:${file("${var.ssh_public_key_file}")}"
+}
+
 #------------------------------------------------------------------------------
 # instance user data 
 #------------------------------------------------------------------------------
@@ -62,13 +67,32 @@ module "network" {
 #------------------------------------------------------------------------------
 
 module "pes" {
-  source            = "pes/"
+  source               = "pes/"
+  namespace            = "${var.namespace}"
+  region               = "${var.region}"
+  zone                 = "${module.network.available_zones}"
+  subnetwork           = "${module.network.private_subnet_self_link}"
+  active_ptfe_instance = "${var.active_ptfe_instance}"
+  active_alias_ip      = "${var.active_alias_ip}"
+  standby_alias_ip     = "${var.standby_alias_ip}"
+  gcp_machine_type     = "${var.gcp_machine_type}"
+  gcp_machine_image    = "${var.gcp_machine_image}"
+  owner                = "${var.owner}"
+  ttl                  = "${var.ttl}"
+}
+
+#------------------------------------------------------------------------------
+# bastion host
+#------------------------------------------------------------------------------
+
+module "bastion" {
+  source            = "bastion/"
   namespace         = "${var.namespace}"
   region            = "${var.region}"
   zone              = "${module.network.available_zones}"
+  subnetwork        = "${module.network.private_subnet_self_link}"
   gcp_machine_type  = "${var.gcp_machine_type}"
   gcp_machine_image = "${var.gcp_machine_image}"
   owner             = "${var.owner}"
   ttl               = "${var.ttl}"
-  subnetwork        = "${module.network.private_subnet_self_link}"
 }
