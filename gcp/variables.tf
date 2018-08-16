@@ -11,16 +11,16 @@ variable "namespace" {
 }
 
 variable "active_ptfe_instance" {
-  description = "The active PTFE instance eg ptfe1"
+  description = "The active PTFE instance ie ptfe1 or ptfe2"
   default     = "ptfe1"
 }
 
 variable "active_alias_ip" {
-  description = "Alias IP attached to the active PTFE instance"
+  description = "Alias IP attached to the active PTFE VM instance"
 }
 
 variable "standby_alias_ip" {
-  description = "Alias IP attached to the standby PTFE instance"
+  description = "Alias IP attached to the standby PTFE VM instance"
 }
 
 variable "gcp_machine_image" {
@@ -31,15 +31,10 @@ variable "gcp_machine_type" {
   description = "GCP machine type"
 }
 
+variable "ssh_user" {
+  description = "User to create on VM instances for SSH access"
+}
+
 variable "ssh_public_key_file" {
-  description = "Path to SSH public key file eg /home/user/.ssh/id_rsa.pub"
-}
-
-variable "owner" {
-  description = "GCP instance owner"
-}
-
-variable "ttl" {
-  description = "GCP instance TTL"
-  default     = "168"
+  description = "Path to SSH public key file for VM instance access eg /home/user/.ssh/id_rsa.pub"
 }

@@ -10,7 +10,7 @@ provider "google" {
 
 resource "google_compute_project_metadata_item" "ssh_key" {
   key   = "ssh-keys"
-  value = "roooms:${file("${var.ssh_public_key_file}")}"
+  value = "${var.ssh_user}:${file("${var.ssh_public_key_file}")}"
 }
 
 #------------------------------------------------------------------------------
@@ -40,8 +40,6 @@ module "network" {
 #  user_data              = ""
 #  ssh_key_name           = "${var.ssh_key_name}"
 #  hashidemos_zone_id     = "${data.aws_route53_zone.hashidemos.zone_id}"
-#  owner                  = "${var.owner}"
-#  ttl                    = "${var.ttl}"
 #}
 
 #------------------------------------------------------------------------------
@@ -58,8 +56,6 @@ module "network" {
 #  user_data              = ""
 #  ssh_key_name           = "${var.ssh_key_name}"
 #  hashidemos_zone_id     = "${data.aws_route53_zone.hashidemos.zone_id}"
-#  owner                  = "${var.owner}"
-#  ttl                    = "${var.ttl}"
 #}
 
 #------------------------------------------------------------------------------
@@ -77,8 +73,6 @@ module "pes" {
   standby_alias_ip     = "${var.standby_alias_ip}"
   gcp_machine_type     = "${var.gcp_machine_type}"
   gcp_machine_image    = "${var.gcp_machine_image}"
-  owner                = "${var.owner}"
-  ttl                  = "${var.ttl}"
 }
 
 #------------------------------------------------------------------------------
@@ -93,6 +87,4 @@ module "bastion" {
   subnetwork        = "${module.network.private_subnet_self_link}"
   gcp_machine_type  = "${var.gcp_machine_type}"
   gcp_machine_image = "${var.gcp_machine_image}"
-  owner             = "${var.owner}"
-  ttl               = "${var.ttl}"
 }
