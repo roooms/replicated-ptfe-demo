@@ -38,3 +38,13 @@ variable "ssh_user" {
 variable "ssh_public_key_file" {
   description = "Path to SSH public key file for VM instance access eg /home/user/.ssh/id_rsa.pub"
 }
+
+variable "startup_script" {
+  description = "what to run at startup"
+  type = "string"
+  default = <<EOS
+#!/bin/bash -xe
+curl https://install.terraform.io/ptfe/stable > /tmp/install_ptfe.sh
+sudo chmod 500 /tmp/install_ptfe.sh
+EOS
+}
